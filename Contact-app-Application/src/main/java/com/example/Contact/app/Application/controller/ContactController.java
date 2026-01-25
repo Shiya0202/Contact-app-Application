@@ -1,30 +1,31 @@
 package com.example.Contact.app.Application.controller;
 
-import com.example.Contact.app.Application.dto.ContactRequestDto;
 import com.example.Contact.app.Application.entity.Contact;
-import com.example.Contact.app.Application.service.ContactService;
-import org.springframework.beans.factory.annotation.Autowired;
+import com.example.Contact.app.Application.repository.ContactRepo;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
 @CrossOrigin
-@RequestMapping("/api")
-public class ContactController
-{
-    @Autowired
-    private ContactService contactService;
+public class ContactController {
 
+    private final ContactRepo contactRepo;
+
+    public ContactController(ContactRepo contactRepo) {
+        this.contactRepo = contactRepo;
+    }
+
+    // Save contact form data
     @PostMapping("/contact")
-    public String submitContact(@ModelAttribute ContactRequestDto dto) {
+    public String submitContact(@ModelAttribute Contact contact) {
+        contactRepo.save(contact);
+        return "redirect:/";
+    }
 
-        Contact contact = new Contact(
-                dto.getName(),
-                dto.getEmail(),
-                dto.getMessage()
-        );
-
-        contactService.processContact(contact);
-
-        return "Form submitted successfully!";
+    // Fetch all contacts
+    @GetMapping("/contacts")
+    public List<Contact> getAllContacts() {
+        return contactRepo.findAll();
     }
 }
