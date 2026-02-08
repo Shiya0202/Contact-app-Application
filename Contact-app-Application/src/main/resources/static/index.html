@@ -17,7 +17,6 @@
             background: linear-gradient(135deg, #f5f7fa, #c3cfe2);
             min-height: 100vh;
             padding-bottom: 50px;
-            position: relative;
             overflow-x: hidden;
         }
 
@@ -53,16 +52,22 @@
             margin-top: 10px;
         }
 
-        /* CONTACT FORM */
+        /* CONTACT FORM WITH BACKGROUND IMAGE */
         .contact {
             max-width: 500px;
             margin: 0 auto 60px;
-            padding: 30px;
-            background: white;
-            border-radius: 10px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            padding: 40px 30px;
+            border-radius: 12px;
             position: relative;
             z-index: 1;
+            color: #fff;
+
+            /* BACKGROUND IMAGE */
+            background:
+                linear-gradient(rgba(0,0,0,0.6), rgba(0,0,0,0.6)),
+                url("contact.webp") center / cover no-repeat;
+
+            box-shadow: 0 15px 40px rgba(0,0,0,0.25);
         }
 
         .contact h2 {
@@ -80,8 +85,9 @@
             margin-bottom: 15px;
             padding: 12px;
             font-size: 16px;
-            border-radius: 5px;
-            border: 1px solid #ccc;
+            border-radius: 6px;
+            border: none;
+            outline: none;
         }
 
         .contact textarea {
@@ -95,8 +101,9 @@
             color: white;
             border: none;
             font-size: 16px;
-            border-radius: 5px;
+            border-radius: 6px;
             cursor: pointer;
+            transition: 0.3s;
         }
 
         .contact button:hover {
@@ -181,7 +188,6 @@
     const form = document.getElementById("contactForm");
     const tableBody = document.getElementById("contactsTableBody");
 
-    // Submit form
     form.addEventListener("submit", function (e) {
         e.preventDefault();
 
@@ -199,7 +205,6 @@
         .catch(err => console.error(err));
     });
 
-    // Load contacts
     function loadContacts() {
         fetch("http://localhost:8080/contacts")
             .then(res => res.json())
@@ -218,7 +223,6 @@
             });
     }
 
-    // Initial load
     loadContacts();
 </script>
 
