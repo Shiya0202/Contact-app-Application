@@ -1,67 +1,226 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-       <meta charset="UTF-8">
-       <title>Contact Management Dashboard</title>
-       <style>
-           body {
-               font-family: Arial, sans-serif;
-               padding: 20px;
-           }
-         table {
-               border-collapse: collapse;
-               width: 100%;
-           }
-           th, td {
-               border: 1px solid #ddd;
-               padding: 8px;
-            }
-           th {
-               background-color: #f2f2f2;
-           }
-       </style>
-    </head>
+    <meta charset="UTF-8">
+    <title>My Landing Page</title>
+
+    <style>
+        /* RESET */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: Arial, sans-serif;
+        }
+
+        body {
+            background: linear-gradient(135deg, #f5f7fa, #c3cfe2);
+            min-height: 100vh;
+            padding-bottom: 50px;
+            position: relative;
+            overflow-x: hidden;
+        }
+
+        /* WATERMARK */
+        .watermark {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%) rotate(-30deg);
+            font-size: 80px;
+            font-weight: bold;
+            color: rgba(0, 0, 0, 0.05);
+            white-space: nowrap;
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        /* HERO */
+        .hero {
+            text-align: center;
+            padding: 80px 20px;
+            position: relative;
+            z-index: 1;
+        }
+
+        .hero h1 {
+            font-size: 48px;
+        }
+
+        .hero p {
+            font-size: 20px;
+            color: #555;
+            margin-top: 10px;
+        }
+
+        /* CONTACT FORM */
+        .contact {
+            max-width: 500px;
+            margin: 0 auto 60px;
+            padding: 30px;
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            position: relative;
+            z-index: 1;
+        }
+
+        .contact h2 {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .contact form {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .contact input,
+        .contact textarea {
+            margin-bottom: 15px;
+            padding: 12px;
+            font-size: 16px;
+            border-radius: 5px;
+            border: 1px solid #ccc;
+        }
+
+        .contact textarea {
+            resize: none;
+            height: 120px;
+        }
+
+        .contact button {
+            padding: 12px;
+            background: #007bff;
+            color: white;
+            border: none;
+            font-size: 16px;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        .contact button:hover {
+            background: #0056b3;
+        }
+
+        /* DASHBOARD */
+        .dashboard {
+            max-width: 900px;
+            margin: auto;
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            position: relative;
+            z-index: 1;
+        }
+
+        .dashboard h2 {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        th, td {
+            padding: 10px;
+            border: 1px solid #ddd;
+        }
+
+        th {
+            background: #f2f2f2;
+        }
+    </style>
+</head>
+
 <body>
 
-<h2>Saved Contacts</h2>
+<!-- WATERMARK -->
+<div class="watermark">MODERN WEB SOLUTIONS</div>
 
-<table id="contactsTable">
+<!-- HERO SECTION -->
+<section class="hero">
+    <h1>Welcome to My Website</h1>
+    <p>We build modern web solutions</p>
+</section>
+
+<!-- CONTACT FORM -->
+<section class="contact">
+    <h2>Contact Us</h2>
+
+    <form id="contactForm">
+        <input type="text" name="name" placeholder="Your Name" required>
+        <input type="email" name="email" placeholder="Your Email" required>
+        <textarea name="message" placeholder="Your Message" required></textarea>
+        <button type="submit">Send Message</button>
+    </form>
+</section>
+
+<!-- CONTACT MANAGEMENT DASHBOARD -->
+<section class="dashboard">
+    <h2>Saved Contacts</h2>
+
+    <table>
         <thead>
-    <tr>
+        <tr>
             <th>ID</th>
             <th>Name</th>
             <th>Email</th>
             <th>Message</th>
         </tr>
-    </thead>
-        <tbody>
-    <!-- Data will be injected here -->
-    </tbody>
+        </thead>
+        <tbody id="contactsTableBody"></tbody>
     </table>
+</section>
 
+<!-- JAVASCRIPT -->
 <script>
-        fetch('/contacts')
-            .then(response => response.json())
+    const form = document.getElementById("contactForm");
+    const tableBody = document.getElementById("contactsTableBody");
+
+    // Submit form
+    form.addEventListener("submit", function (e) {
+        e.preventDefault();
+
+        const formData = new FormData(form);
+
+        fetch("http://localhost:8080/contact", {
+            method: "POST",
+            body: formData
+        })
+        .then(res => res.json())
+        .then(() => {
+            form.reset();
+            loadContacts();
+        })
+        .catch(err => console.error(err));
+    });
+
+    // Load contacts
+    function loadContacts() {
+        fetch("http://localhost:8080/contacts")
+            .then(res => res.json())
             .then(data => {
-                const tableBody = document.querySelector('#contactsTable tbody');
-
-                data.forEach(contact => {
-                    const row = document.createElement('tr');
-
+                tableBody.innerHTML = "";
+                data.forEach(c => {
+                    const row = document.createElement("tr");
                     row.innerHTML = `
-                        <td>${contact.id}</td>
-                        <td>${contact.name}</td>
-                        <td>${contact.email}</td>
-                        <td>${contact.message}</td>
+                        <td>${c.id}</td>
+                        <td>${c.name}</td>
+                        <td>${c.email}</td>
+                        <td>${c.message}</td>
                     `;
-
                     tableBody.appendChild(row);
                 });
-            })
-            .catch(error => {
-                console.error('Error fetching contacts:', error);
             });
-    </script>
+    }
+
+    // Initial load
+    loadContacts();
+</script>
 
 </body>
 </html>
