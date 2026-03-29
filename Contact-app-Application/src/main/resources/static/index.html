@@ -1,229 +1,44 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-    <meta charset="UTF-8">
-    <title>My Landing Page</title>
-
-    <style>
-        /* RESET */
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            font-family: Arial, sans-serif;
-        }
-
-        body {
-            background: linear-gradient(135deg, #f5f7fa, #c3cfe2);
-            min-height: 100vh;
-            padding-bottom: 50px;
-            overflow-x: hidden;
-        }
-
-        /* WATERMARK */
-        .watermark {
-            position: fixed;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%) rotate(-30deg);
-            font-size: 80px;
-            font-weight: bold;
-            color: rgba(0, 0, 0, 0.05);
-            white-space: nowrap;
-            pointer-events: none;
-            z-index: 0;
-        }
-
-        /* HERO */
-        .hero {
-            text-align: center;
-            padding: 80px 20px;
-            position: relative;
-            z-index: 1;
-        }
-
-        .hero h1 {
-            font-size: 48px;
-        }
-
-        .hero p {
-            font-size: 20px;
-            color: #555;
-            margin-top: 10px;
-        }
-
-        /* CONTACT FORM WITH BACKGROUND IMAGE */
-        .contact {
-            max-width: 500px;
-            margin: 0 auto 60px;
-            padding: 40px 30px;
-            border-radius: 12px;
-            position: relative;
-            z-index: 1;
-            color: #fff;
-
-            /* BACKGROUND IMAGE */
-            background:
-                linear-gradient(rgba(0,0,0,0.6), rgba(0,0,0,0.6)),
-                url("contact.webp") center / cover no-repeat;
-
-            box-shadow: 0 15px 40px rgba(0,0,0,0.25);
-        }
-
-        .contact h2 {
-            text-align: center;
-            margin-bottom: 20px;
-        }
-
-        .contact form {
-            display: flex;
-            flex-direction: column;
-        }
-
-        .contact input,
-        .contact textarea {
-            margin-bottom: 15px;
-            padding: 12px;
-            font-size: 16px;
-            border-radius: 6px;
-            border: none;
-            outline: none;
-        }
-
-        .contact textarea {
-            resize: none;
-            height: 120px;
-        }
-
-        .contact button {
-            padding: 12px;
-            background: #007bff;
-            color: white;
-            border: none;
-            font-size: 16px;
-            border-radius: 6px;
-            cursor: pointer;
-            transition: 0.3s;
-        }
-
-        .contact button:hover {
-            background: #0056b3;
-        }
-
-        /* DASHBOARD */
-        .dashboard {
-            max-width: 900px;
-            margin: auto;
-            background: white;
-            padding: 30px;
-            border-radius: 10px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
-            position: relative;
-            z-index: 1;
-        }
-
-        .dashboard h2 {
-            text-align: center;
-            margin-bottom: 20px;
-        }
-
-        table {
-            width: 100%;
-            border-collapse: collapse;
-        }
-
-        th, td {
-            padding: 10px;
-            border: 1px solid #ddd;
-        }
-
-        th {
-            background: #f2f2f2;
-        }
-    </style>
+    <title>Contact App</title>
 </head>
-
 <body>
 
-<!-- WATERMARK -->
-<div class="watermark">MODERN WEB SOLUTIONS</div>
+<h2>Contact Form</h2>
+<form id="form">
+    <input name="name" placeholder="Name" required><br>
+    <input name="email" placeholder="Email" required><br>
+    <textarea name="message" placeholder="Message"></textarea><br>
+    <button type="submit">Send</button>
+</form>
 
-<!-- HERO SECTION -->
-<section class="hero">
-    <h1>Welcome to My Website</h1>
-    <p>We build modern web solutions</p>
-</section>
-
-<!-- CONTACT FORM -->
-<section class="contact">
-    <h2>Contact Us</h2>
-
-    <form id="contactForm">
-        <input type="text" name="name" placeholder="Your Name" required>
-        <input type="email" name="email" placeholder="Your Email" required>
-        <textarea name="message" placeholder="Your Message" required></textarea>
-        <button type="submit">Send Message</button>
-    </form>
-</section>
-
-<!-- CONTACT MANAGEMENT DASHBOARD -->
-<section class="dashboard">
-    <h2>Saved Contacts</h2>
-
-    <table>
-        <thead>
-        <tr>
-            <th>ID</th>
-            <th>Name</th>
-            <th>Email</th>
-            <th>Message</th>
-        </tr>
-        </thead>
-        <tbody id="contactsTableBody"></tbody>
-    </table>
-</section>
-
-<!-- JAVASCRIPT -->
+<h2>Contacts</h2>
+<table border="1">
+    <thead><tr><th>ID</th><th>Name</th><th>Email</th><th>Message</th></tr></thead>
+    <tbody id="data"></tbody>
+</table>
 <script>
-    const form = document.getElementById("contactForm");
-    const tableBody = document.getElementById("contactsTableBody");
+    const form = document.getElementById("form");
+    const data = document.getElementById("data");
 
-    form.addEventListener("submit", function (e) {
-        e.preventDefault();
+    form.onsubmit = async (e) => {
+     e.preventDefault();
+     const fd = new FormData(form);
+     await fetch("/contact", { method: "POST", body: fd });
+     load();
+    };
 
-        const formData = new FormData(form);
-
-        fetch("http://localhost:8080/contact", {
-            method: "POST",
-            body: formData
-        })
-        .then(res => res.json())
-        .then(() => {
-            form.reset();
-            loadContacts();
-        })
-        .catch(err => console.error(err));
-    });
-
-    function loadContacts() {
-        fetch("http://localhost:8080/contacts")
-            .then(res => res.json())
-            .then(data => {
-                tableBody.innerHTML = "";
-                data.forEach(c => {
-                    const row = document.createElement("tr");
-                    row.innerHTML = `
-                        <td>${c.id}</td>
-                        <td>${c.name}</td>
-                        <td>${c.email}</td>
-                        <td>${c.message}</td>
-                    `;
-                    tableBody.appendChild(row);
-                });
-            });
+    async function load() {
+     const res = await fetch("/contacts");
+     const list = await res.json();
+     data.innerHTML = "";
+     list.forEach(c => {
+       data.innerHTML += `<tr><td>${c.id}</td><td>${c.name}</td><td>${c.email}</td><td>${c.message}</td></tr>`;
+     });
     }
 
-    loadContacts();
+    load();
 </script>
 
 </body>

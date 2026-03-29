@@ -7,24 +7,23 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@CrossOrigin(origins = "*")
+@CrossOrigin("*")
 public class ContactController {
 
-    private final ContactRepo contactRepo;
+    private final ContactRepo repo;
 
-    public ContactController(ContactRepo contactRepo) {
-        this.contactRepo = contactRepo;
+    public ContactController(ContactRepo repo) {
+        this.repo = repo;
     }
 
-    // Save contact form data (HTML form submission)
     @PostMapping("/contact")
-    public Contact submitContact(@ModelAttribute Contact contact) {
-        return contactRepo.save(contact);
+    public Contact save(Contact contact) {
+        return repo.save(contact);
     }
 
-    // Fetch all contacts (REST API for dashboard)
     @GetMapping("/contacts")
-    public List<Contact> getAllContacts() {
-        return contactRepo.findAll();
+    public List<Contact> getAll() {
+        return repo.findAll();
     }
 }
+
